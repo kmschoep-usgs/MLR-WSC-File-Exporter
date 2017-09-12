@@ -86,6 +86,9 @@ def valid_payload():
 @api.route('/file_export/add')
 class AddFileExporter(Resource):
 
+    @api.response(200, "Successfully wrote transaction file")
+    @api.response(400, "Bad request")
+    @api.response(500, "Unable to write the file")
     @api.expect(location_model)
     def post(self):
         data = request.get_json()
@@ -96,9 +99,18 @@ class AddFileExporter(Resource):
                 'error_message':'Not all keys where found'
             }, 400
 
+
 @api.route('/file_export/update')
+@api.response(200, "Successfully wrote transaction file")
+@api.response(400, "Bad request")
+@api.response(500, "Unable to write the file")
 class UpdateFileExporter(Resource):
 
     @api.expect(location_model)
     def post(self):
-        return 'Not yet implemented', 400
+        if valid_payload:
+            return 'Not yet implemented', 200
+        else:
+            return {
+                'error_message':'Not all keys where found'
+            }, 400
