@@ -95,7 +95,6 @@ def _get_post_response(location, transaction_type=''):
        }, 400
 
     else:
-        fd = StringIO()
         file_name = transaction_file_name(location)
         output_fd = open(os.path.join(application.config['EXPORT_DIRECTORY'], file_name), 'w')
         write_transaction(output_fd, location, transaction_type=transaction_type)
