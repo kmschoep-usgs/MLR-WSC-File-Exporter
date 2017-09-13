@@ -1,8 +1,11 @@
+from io import StringIO
+import os
 
 from flask import request
 from flask_restplus import Api, Resource, fields, marshal, reqparse
 
 from app import application
+from export_utils import write_transaction, transaction_file_name
 
 api = Api(application,
           title='MLR WSC File Exporter',
@@ -11,8 +14,8 @@ api = Api(application,
           doc='/api')
 
 location_model = api.model('LocationModel', {
-    "agencyCode": fields.String(required=True),
-    "agencyUseCode": fields.String(required=True),
+    "agencyCode": fields.String,
+    "agencyUseCode": fields.String,
     "altitude": fields.String(),
     "altitudeAccuracyValue": fields.String(),
     "altitudeDatumCode": fields.String(),
@@ -31,8 +34,8 @@ location_model = api.model('LocationModel', {
     "dataReliabilityCode": fields.String(),
     "dataTypesCode": fields.String(),
     "daylightSavingsTimeFlag": fields.String(),
-    "decimalLatitude": fields.String(),
-    "decimalLongitude": fields.String(),
+    "decimalLatitude": fields.Integer(),
+    "decimalLongitude": fields.Integer(),
     "districtCode": fields.String(),
     "drainageArea": fields.String(),
     "firstConstructionDate": fields.String(),
@@ -74,14 +77,30 @@ location_model = api.model('LocationModel', {
 
 expected_keys = set(iter(location_model.keys()))
 
-def valid_payload():
+def _missing_keys(json_data):
     '''
-    Determines if the payload has the expected keys
-    :return: bool
-    '''
-    request_keys = set(iter(request.get_json().keys()))
-    return len(expected_keys.difference(request_keys)) == 0
 
+    :param dict json_data:
+    :return: list of strings - missing keys
+    '''
+    request_keys = set(iter(json_data.keys()))
+    return expected_keys.difference(request_keys)
+
+
+def _get_post_response(location, transaction_type=''):
+    missing_keys = _missing_keys(location)
+    if missing_keys:
+        return {
+           'error_message': 'Missing keys: {0}'.format(', '.join(missing_keys))
+       }, 400
+
+    else:
+        fd = StringIO()
+        file_name = transaction_file_name(location)
+        output_fd = open(os.path.join(application.config['EXPORT_DIRECTORY'], file_name), 'w')
+        write_transaction(output_fd, location, transaction_type=transaction_type)
+        output_fd.close()
+        return None, 200
 
 @api.route('/file_export/add')
 class AddFileExporter(Resource):
@@ -91,26 +110,15 @@ class AddFileExporter(Resource):
     @api.response(500, "Unable to write the file")
     @api.expect(location_model)
     def post(self):
-        data = request.get_json()
-        if valid_payload:
-            return 'Not yet implemented', 200
-        else:
-            return {
-                'error_message':'Not all keys where found'
-            }, 400
+        return _get_post_response(request.get_json(), transaction_type='Create')
 
 
 @api.route('/file_export/update')
-@api.response(200, "Successfully wrote transaction file")
-@api.response(400, "Bad request")
-@api.response(500, "Unable to write the file")
 class UpdateFileExporter(Resource):
 
+    @api.response(200, "Successfully wrote transaction file")
+    @api.response(400, "Bad request")
+    @api.response(500, "Unable to write the file")
     @api.expect(location_model)
     def post(self):
-        if valid_payload:
-            return 'Not yet implemented', 200
-        else:
-            return {
-                'error_message':'Not all keys where found'
-            }, 400
+        return _get_post_response(request.get_json(), transaction_type='Update')
