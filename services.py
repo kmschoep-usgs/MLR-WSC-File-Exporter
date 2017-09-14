@@ -96,10 +96,14 @@ def _get_post_response(location, transaction_type=''):
 
     else:
         file_name = transaction_file_name(location)
-        output_fd = open(os.path.join(application.config['EXPORT_DIRECTORY'], file_name), 'w')
-        write_transaction(output_fd, location, transaction_type=transaction_type)
-        output_fd.close()
-        return None, 200
+        try:
+            output_fd = open(os.path.join(application.config['EXPORT_DIRECTORY'], file_name), 'w')
+            write_transaction(output_fd, location, transaction_type=transaction_type)
+            output_fd.close()
+            return None, 200
+        except IOError:
+            return 'Unable to write the file', 500
+
 
 @api.route('/file_export/add')
 class AddFileExporter(Resource):
