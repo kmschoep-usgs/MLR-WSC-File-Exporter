@@ -29,7 +29,7 @@ def read(filepath):
 
 requirements = read_requirements('requirements.txt')
 
-setup(name='usgs_wma_mlr_ddot_ingester',
+setup(name='usgs_wma_mlr_wsc_file_exporter',
       version='0.1.0dev',
       description='MLR Ddot Ingester Microservice',
       author='Mary Bucknell, Andrew Yan, Dave Steinich, Zack Moore, Kathy Schoephoester',
