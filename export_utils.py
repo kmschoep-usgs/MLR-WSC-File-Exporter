@@ -62,7 +62,7 @@ KEY_TO_COLUMN_MAPPING = {
     "minorCivilDivisionCode": "mcd_cd"
 }
 
-def value_str(value):
+def _value_str(value):
     return '' if value is None else str(value)
 
 
@@ -85,7 +85,7 @@ def write_transaction(fd, location, transaction_type=''):
     fd.write('trans_type={0}\n'.format(transaction_type))
     for key in location.keys():
         if key in KEY_TO_COLUMN_MAPPING:
-            fd.write('{0}={1}\n'.format(KEY_TO_COLUMN_MAPPING.get(key), value_str(location.get(key))))
+            fd.write('{0}={1}\n'.format(KEY_TO_COLUMN_MAPPING.get(key), _value_str(location.get(key))))
     fd.write('DONE')
 
 
