@@ -87,7 +87,13 @@ def _missing_keys(json_data):
     return expected_keys.difference(request_keys)
 
 
-def _get_post_response(location, transaction_type=''):
+def _process_post(location, transaction_type=''):
+    '''
+
+    :param dict location:
+    :param str transaction_type: Will be assigned to the 'trans_type' field in the exported file
+    :return: tuple (response_data, response_status)
+    '''
     missing_keys = _missing_keys(location)
     if missing_keys:
         return {
@@ -113,7 +119,7 @@ class AddFileExporter(Resource):
     @api.response(500, "Unable to write the file")
     @api.expect(location_model)
     def post(self):
-        return _get_post_response(request.get_json(), transaction_type='Create')
+        return _process_post(request.get_json(), transaction_type='Create')
 
 
 @api.route('/file_export/update')
@@ -124,4 +130,4 @@ class UpdateFileExporter(Resource):
     @api.response(500, "Unable to write the file")
     @api.expect(location_model)
     def post(self):
-        return _get_post_response(request.get_json(), transaction_type='Update')
+        return _process_post(request.get_json(), transaction_type='Update')
