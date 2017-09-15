@@ -102,3 +102,6 @@ ENV/
 
 # IDE files
 .idea/
+
+# crt file for docker
+root.crt
