@@ -104,11 +104,12 @@ def _process_post(location, transaction_type=''):
         file_name = transaction_file_name(location)
         try:
             output_fd = open(os.path.join(application.config['EXPORT_DIRECTORY'], file_name), 'w')
-            write_transaction(output_fd, location, transaction_type=transaction_type)
-            output_fd.close()
-            return None, 200
         except IOError:
             return 'Unable to write the file', 500
+        else:
+            with output_fd:
+                write_transaction(output_fd, location, transaction_type=transaction_type)
+            return None, 200
 
 
 @api.route('/file_export/add')
