@@ -42,7 +42,7 @@ cert in '/rootcrt'. Below is an example of how to build.
 docker build --build-arg artifact_version=0.1.0.dev0 --build-arg build_type=snapshots -t mlr_file_exporter -f Dockerfile-DOI .
 ```
 
-To run you will need to specify a bind mount on the host system where you want the exported files written (the src part of the bind). 
+To run, you can specify a bind mount on the host system where you want the exported files written (the src part of the bind). 
 Below is an example:
 ```bash
 docker run --publish 5000:7010 --mount type=bind,src=/Users/mbucknel/temp/mlr,dst=/export_results mlr_file_exporter
