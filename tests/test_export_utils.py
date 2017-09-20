@@ -1,28 +1,23 @@
 
 from collections import OrderedDict
-from datetime import datetime, timezone
 from io import StringIO
-from unittest import TestCase, mock
+from unittest import TestCase
 
 from export_utils import transaction_file_name, write_transaction
 
 class TestTransactionFileName(TestCase):
 
-    def setUp(self):
-        self.now = datetime(2017, 10, 3, hour=13, minute=30, second=45, tzinfo=timezone.utc )
 
     def test_no_site_number(self):
-        with mock.patch('export_utils.datetime') as mock_datetime:
-            mock_datetime.utcnow.return_value=self.now
-            mock_datetime.side_effect=lambda *args, **kw: datetime(*args, **kw)
-            self.assertEqual(transaction_file_name({'agencyCode': 'USGS'}), 'mlr..20171003133045')
+        self.assertEqual(transaction_file_name({'agencyCode': 'USGS', 'updated': '2017-10-03 13:30:45'}), 'mlr..20171003133045')
 
     def test_with_site_number(self):
-        with mock.patch('export_utils.datetime') as mock_datetime:
-            mock_datetime.utcnow.return_value=self.now
-            mock_datetime.side_effect=lambda *args, **kw: datetime(*args, **kw)
-            self.assertEqual(transaction_file_name({'agencyCode': 'USGS', 'siteNumber': '0123456789012'}),
+        self.assertEqual(transaction_file_name({'agencyCode': 'USGS', 'siteNumber': '0123456789012', 'updated': '2017-10-03 13:30:45'}),
                              'mlr.0123456789012.20171003133045')
+
+    def test_with_no_updated(self):
+        self.assertEqual(transaction_file_name({'agencyCode': 'USGS', 'siteNumber': '0123456789012'}),
+                         'mlr.0123456789012.')
 
 
 class TestWriteTransaction(TestCase):
@@ -86,9 +81,9 @@ class TestWriteTransaction(TestCase):
             "projectNumber": "123456789012",
             "siteWebReadyCode": "N",
             "createdBy": "asmith  ",
-            "created": "20171101144535",
+            "created": "2017-11-01 14:45:35",
             "updatedBy": "bjones  ",
-            "updated": "20171214120244",
+            "updated": "2017-12-14 12:02:44",
             "minorCivilDivisionCode": None
         })
 
@@ -147,9 +142,9 @@ class TestWriteTransaction(TestCase):
         "project_no=123456789012\n"
         "site_web_cd=N\n"
         "site_cn=asmith  \n"
-        "site_cr=20171101144535\n"
+        "site_cr=2017-11-01 14:45:35\n"
         "site_mn=bjones  \n"
-        "site_md=20171214120244\n"
+        "site_md=2017-12-14 12:02:44\n"
         "mcd_cd=\n"
         "DONE"
         )

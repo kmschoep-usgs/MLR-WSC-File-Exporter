@@ -1,5 +1,6 @@
 
 from datetime import datetime
+import re
 
 KEY_TO_COLUMN_MAPPING = {
     "agencyCode": "agency_cd",
@@ -72,7 +73,7 @@ def transaction_file_name(location):
     :param dict location:
     :return: str
     '''
-    return 'mlr.{0}.{1}'.format(location.get('siteNumber', ''), datetime.utcnow().strftime('%Y%m%d%H%M%S'))
+    return 'mlr.{0}.{1}'.format(location.get('siteNumber', ''), re.sub('[^\d]', '', location.get('updated', '')))
 
 
 def write_transaction(fd, location, transaction_type=''):
