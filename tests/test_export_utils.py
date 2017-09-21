@@ -142,9 +142,9 @@ class TestWriteTransaction(TestCase):
         "project_no=123456789012\n"
         "site_web_cd=N\n"
         "site_cn=asmith  \n"
-        "site_cr=2017-11-01 14:45:35\n"
+        "site_cr=20171101144535\n"
         "site_mn=bjones  \n"
-        "site_md=2017-12-14 12:02:44\n"
+        "site_md=20171214120244\n"
         "mcd_cd=\n"
         "DONE"
         )

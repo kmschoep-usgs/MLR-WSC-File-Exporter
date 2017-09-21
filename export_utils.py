@@ -62,6 +62,8 @@ KEY_TO_COLUMN_MAPPING = {
     "minorCivilDivisionCode": "mcd_cd"
 }
 
+DATE_TRANSFORM_REGEX = re.compile('[^\d]')
+
 def _value_str(value):
     return '' if value is None else str(value)
 
@@ -72,7 +74,7 @@ def transaction_file_name(location):
     :param dict location:
     :return: str
     '''
-    return 'mlr.{0}.{1}'.format(location.get('siteNumber', ''), re.sub('[^\d]', '', location.get('updated', '')))
+    return 'mlr.{0}.{1}'.format(location.get('siteNumber', ''), re.sub(DATE_TRANSFORM_REGEX, '', location.get('updated', '')))
 
 
 def write_transaction(fd, location, transaction_type=''):
@@ -82,10 +84,14 @@ def write_transaction(fd, location, transaction_type=''):
     :param dict location:
     :param transaction:
     '''
+    # Transform the two date fields
+    transformed_location = location.copy()
+    transformed_location['updated'] = re.sub(DATE_TRANSFORM_REGEX, '', location.get('updated', ''))
+    transformed_location['created'] = re.sub(DATE_TRANSFORM_REGEX, '', location.get('created', ''))
     fd.write('trans_type={0}\n'.format(transaction_type))
     for key in location.keys():
         if key in KEY_TO_COLUMN_MAPPING:
-            fd.write('{0}={1}\n'.format(KEY_TO_COLUMN_MAPPING.get(key), _value_str(location.get(key))))
+            fd.write('{0}={1}\n'.format(KEY_TO_COLUMN_MAPPING.get(key), _value_str(transformed_location.get(key))))
     fd.write('DONE')
 
 
