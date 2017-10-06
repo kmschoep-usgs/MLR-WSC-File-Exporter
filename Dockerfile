@@ -2,7 +2,6 @@ FROM alpine:3.6
 ARG artifact_version
 ARG build_type
 ARG listening_port=7010
-ARG sdlc_tier
 RUN apk update && apk upgrade && mkdir /local
 RUN apk add --update \
   python3 \
@@ -18,7 +17,6 @@ RUN export PIP_CERT="/etc/ssl/certs/ca-certificates.crt" && \
 ENV bind_ip 0.0.0.0
 ENV bind_port ${listening_port}
 ENV log_level INFO
-ENV tiername ${sldc_tier}
 ENV EXPORT_DIRECTORY /export_results
 VOLUME /export_results
 EXPOSE ${bind_port}
