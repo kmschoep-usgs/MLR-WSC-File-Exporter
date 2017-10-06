@@ -5,7 +5,7 @@ from flask import request
 from flask_restplus import Api, Resource, fields, marshal, reqparse
 
 from app import application
-from export_utils import write_transaction, transaction_file_name
+from export_utils import write_transaction, transaction_file_name, upload_to_s3
 
 api = Api(application,
           title='MLR WSC File Exporter',
@@ -101,9 +101,8 @@ def _process_post(location, transaction_type=''):
        }, 400
 
     else:
-        file_name = transaction_file_name(location)
         try:
-            output_fd = open(os.path.join(application.config['EXPORT_DIRECTORY'], file_name), 'w')
+            output_fd = BytesIO()
         except IOError:
             return 'Unable to write the file', 500
         else:
