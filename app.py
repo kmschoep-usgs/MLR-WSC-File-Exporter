@@ -10,7 +10,10 @@ PROJECT_DIR = PROJECT_DIR = os.path.dirname(__file__)
 if os.path.exists(os.path.join(PROJECT_DIR, '.env')):
     application.config.from_pyfile('.env')
 
-application.config['tiername'] = os.getenv('tiername', 'development')
+application.config['s3_bucket'] = os.getenv('s3_bucket')
+application.config['aws_region'] = os.getenv('aws_region')
+application.config['tiername'] = os.getenv('tiername')
+
 
 from services import *
 

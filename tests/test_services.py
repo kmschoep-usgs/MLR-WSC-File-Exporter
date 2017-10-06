@@ -1,6 +1,8 @@
 import json
 from unittest import TestCase, mock
 
+from botocore.exceptions import ParamValidationError
+
 import app
 
 
@@ -10,7 +12,6 @@ class AddFileExportTestCase(TestCase):
 
     def setUp(self):
         app.application.testing = True
-        app.application.config['EXPORT_DIRECTORY'] = '/tmp'
         self.app_client = app.application.test_client()
 
         self.location = {
@@ -75,7 +76,7 @@ class AddFileExportTestCase(TestCase):
             "minorCivilDivisionCode": None
         }
 
-    def test_good_location(self, mtransaction, mclient):
+    def test_good_upload(self, mtransaction, mclient):
         response = self.app_client.post('/file_export/add',
                                         content_type='application/json',
                                         data=json.dumps(self.location))
@@ -93,9 +94,8 @@ class AddFileExportTestCase(TestCase):
                                         content_type='application/json',
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 400)
-        resp_data = json.loads(response.data)
 
-    def test_unable_to_write_file(self, mtransaction, mclient):
+    def test_s3_upload_oserror(self, mtransaction, mclient):
         s3_connection_mock = mock.Mock()
         s3_connection_mock.upload_fileobj.side_effect = OSError
         mclient.return_value = s3_connection_mock
@@ -104,12 +104,30 @@ class AddFileExportTestCase(TestCase):
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 500)
 
+    def test_s3_upload_valueerror(self, mtransaction, mclient):
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.side_effect = ValueError
+        mclient.return_value = s3_connection_mock
+        response = self.app_client.post('/file_export/add',
+                                        content_type='application/json',
+                                        data=json.dumps(self.location))
+        self.assertEqual(response.status_code, 500)
+
+    def test_s3_upload_paramvalidationerror(self, mtransaction, mclient):
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.side_effect = ParamValidationError(report='Some validation error')
+        mclient.return_value = s3_connection_mock
+        response = self.app_client.post('/file_export/add',
+                                        content_type='application/json',
+                                        data=json.dumps(self.location))
+        self.assertEqual(response.status_code, 500)
+
+
 @mock.patch('export_utils.boto3.client')
 @mock.patch('services.write_transaction')
 class UpdateFileExportTestCase(TestCase):
     def setUp(self):
         app.application.testing = True
-        app.application.config['EXPORT_DIRECTORY'] = '/tmp'
         self.app_client = app.application.test_client()
 
         self.location = {
@@ -191,9 +209,27 @@ class UpdateFileExportTestCase(TestCase):
         self.assertEqual(response.status_code, 400)
         resp_data = json.loads(response.data)
 
-    def test_unable_to_write_file(self, mtransaction, mclient):
+    def test_s3_upload_oserror(self, mtransaction, mclient):
         s3_connection_mock = mock.Mock()
         s3_connection_mock.upload_fileobj.side_effect = OSError
+        mclient.return_value = s3_connection_mock
+        response = self.app_client.post('/file_export/add',
+                                        content_type='application/json',
+                                        data=json.dumps(self.location))
+        self.assertEqual(response.status_code, 500)
+
+    def test_s3_upload_valueerror(self, mtransaction, mclient):
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.side_effect = ValueError
+        mclient.return_value = s3_connection_mock
+        response = self.app_client.post('/file_export/add',
+                                        content_type='application/json',
+                                        data=json.dumps(self.location))
+        self.assertEqual(response.status_code, 500)
+
+    def test_s3_upload_paramvalidationerror(self, mtransaction, mclient):
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.side_effect = ParamValidationError(report='Some validation error')
         mclient.return_value = s3_connection_mock
         response = self.app_client.post('/file_export/add',
                                         content_type='application/json',
