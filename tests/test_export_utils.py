@@ -1,9 +1,10 @@
 
 from collections import OrderedDict
-from io import StringIO
+from io import StringIO, BytesIO
 from unittest import TestCase
+from unittest.mock import Mock, patch
 
-from export_utils import transaction_file_name, write_transaction
+from export_utils import transaction_file_name, write_transaction, upload_to_s3
 
 
 class TestTransactionFileName(TestCase):
@@ -160,3 +161,21 @@ class TestWriteTransaction(TestCase):
         self.maxDiff = None
         write_transaction(self.fd, self.location, transaction_type= 'Update')
         self.assertEqual(self.fd.getvalue(), 'trans_type=Update\n{0}'.format(self.expected_response))
+
+
+class TestUploadToS3(TestCase):
+
+    def setUp(self):
+        self.payload = BytesIO(b'some text')
+        self.destination_key = 'transaction/test/file.txt'
+        self.bucket = 'fake-bucket'
+        self.region = 'us-west-2'
+
+    @patch('export_utils.boto3.client')
+    def test_upload(self, mock_client):
+        s3_connection_mock = Mock()
+        s3_connection_mock.upload_fileobj.return_value = None
+        mock_client.return_value = s3_connection_mock
+        upload_to_s3(self.payload, self.destination_key, self.bucket, self.region)
+        mock_client.assert_called_with('s3', region_name=self.region)
+        s3_connection_mock.upload_fileobj.assert_called_with(self.payload, self.bucket, self.destination_key)
