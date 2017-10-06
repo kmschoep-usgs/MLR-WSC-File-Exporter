@@ -1,5 +1,6 @@
 from io import BytesIO
 
+from botocore import exceptions
 from flask import request
 from flask_restplus import Api, Resource, fields
 
@@ -104,12 +105,14 @@ def _process_post(location, transaction_type=''):
         output_fd = BytesIO()
         write_transaction(output_fd, location, transaction_type=transaction_type)
         tiername = application.config['tiername']
+        destination_key = 'transactions/{0}/{1}'.format(tiername, file_name)
+        output_fd.seek(0)
         try:
-            upload_to_s3(output_fd, 'transactions/{0}/{1}'.format(tiername, file_name))
-        except OSError:
+            upload_to_s3(output_fd, destination_key)
+        except (OSError, ValueError, exceptions.ParamValidationError):
             return 'Unable to write the file', 500
         else:
-            return None, 200
+            return 'File written to s3://mlr-exports/{0}'.format(destination_key), 200
 
 
 @api.route('/file_export/add')

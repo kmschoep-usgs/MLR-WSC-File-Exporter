@@ -104,4 +104,4 @@ def write_transaction(fd, location, transaction_type=''):
 
 def upload_to_s3(payload, destination_key, bucket='mlr-exports', region='us-west-2'):
     s3_client = boto3.client('s3', region_name=region)
-    s3_client.upload_fileobj(payload, bucket, destination_key)
+    s3_client.upload_fileobj(payload, Bucket=bucket, Key=destination_key)

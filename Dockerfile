@@ -17,7 +17,6 @@ RUN export PIP_CERT="/etc/ssl/certs/ca-certificates.crt" && \
 ENV bind_ip 0.0.0.0
 ENV bind_port ${listening_port}
 ENV log_level INFO
-ENV EXPORT_DIRECTORY /export_results
 VOLUME /export_results
 EXPOSE ${bind_port}
 CMD ["/usr/bin/gunicorn", "--reload",  "app", "--config", "file:/local/gunicorn_config.py"]

@@ -10,7 +10,7 @@ PROJECT_DIR = PROJECT_DIR = os.path.dirname(__file__)
 if os.path.exists(os.path.join(PROJECT_DIR, '.env')):
     application.config.from_pyfile('.env')
 
-application.config['tiername'] = os.getenv('teirname', 'development')
+application.config['tiername'] = os.getenv('tiername', 'development')
 
 from services import *
 

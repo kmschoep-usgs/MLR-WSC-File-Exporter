@@ -175,4 +175,7 @@ class TestUploadToS3(TestCase):
         mock_client.return_value = s3_connection_mock
         upload_to_s3(self.payload, self.destination_key, self.bucket, self.region)
         mock_client.assert_called_with('s3', region_name=self.region)
-        s3_connection_mock.upload_fileobj.assert_called_with(self.payload, self.bucket, self.destination_key)
+        s3_connection_mock.upload_fileobj.assert_called_with(self.payload,
+                                                             Bucket=self.bucket,
+                                                             Key=self.destination_key
+                                                             )
