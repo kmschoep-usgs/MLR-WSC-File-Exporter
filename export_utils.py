@@ -91,11 +91,15 @@ def write_transaction(fd, location, transaction_type=''):
     transformed_location = location.copy()
     transformed_location['updated'] = re.sub(DATE_TRANSFORM_REGEX, '', location.get('updated', ''))
     transformed_location['created'] = re.sub(DATE_TRANSFORM_REGEX, '', location.get('created', ''))
-    fd.write('trans_type={0}\n'.format(transaction_type))
+    fd.write('trans_type={0}\n'.format(transaction_type).encode())
     for key in location.keys():
         if key in KEY_TO_COLUMN_MAPPING:
-            fd.write('{0}={1}\n'.format(KEY_TO_COLUMN_MAPPING.get(key), _value_str(transformed_location.get(key))))
-    fd.write('DONE')
+            fd.write('{0}={1}\n'.format(KEY_TO_COLUMN_MAPPING.get(key),
+                                        _value_str(transformed_location.get(key)
+                                                   )
+                                        ).encode()
+                     )
+    fd.write('DONE'.encode())
 
 
 def upload_to_s3(payload, destination_key, bucket='mlr-exports', region='us-west-2'):

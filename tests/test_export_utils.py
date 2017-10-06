@@ -1,6 +1,6 @@
 
 from collections import OrderedDict
-from io import StringIO, BytesIO
+from io import BytesIO
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
@@ -24,7 +24,7 @@ class TestTransactionFileName(TestCase):
 class TestWriteTransaction(TestCase):
 
     def setUp(self):
-        self.fd = StringIO()
+        self.fd = BytesIO()
         # Using an ordered dictionary to guarentee iteration order
         self.location = OrderedDict({
             'id' : 1234,
@@ -150,17 +150,14 @@ class TestWriteTransaction(TestCase):
         "DONE"
         )
 
-    def tearDown(self):
-        self.fd.close()
-
     def test_empty_dict(self):
         write_transaction(self.fd, {}, transaction_type='Create')
-        self.assertEqual(self.fd.getvalue(), 'trans_type=Create\nDONE')
+        self.assertEqual(self.fd.getvalue(), 'trans_type=Create\nDONE'.encode())
 
     def test_normal_location(self):
         self.maxDiff = None
         write_transaction(self.fd, self.location, transaction_type= 'Update')
-        self.assertEqual(self.fd.getvalue(), 'trans_type=Update\n{0}'.format(self.expected_response))
+        self.assertEqual(self.fd.getvalue(), 'trans_type=Update\n{0}'.format(self.expected_response).encode())
 
 
 class TestUploadToS3(TestCase):
