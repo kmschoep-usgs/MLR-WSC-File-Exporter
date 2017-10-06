@@ -2,7 +2,7 @@ from io import BytesIO
 import os
 
 from flask import request
-from flask_restplus import Api, Resource, fields, marshal, reqparse
+from flask_restplus import Api, Resource, fields
 
 from app import application
 from export_utils import write_transaction, transaction_file_name, upload_to_s3
@@ -108,6 +108,7 @@ def _process_post(location, transaction_type=''):
         else:
             with output_fd:
                 write_transaction(output_fd, location, transaction_type=transaction_type)
+            upload_to_s3(output_fd, 'transactions/qa/')
             return None, 200
 
 
