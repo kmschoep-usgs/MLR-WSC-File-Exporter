@@ -1,4 +1,4 @@
-from io import StringIO
+from io import BytesIO
 import os
 
 from flask import request

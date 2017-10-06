@@ -1,6 +1,9 @@
 
 import re
 
+import boto3
+
+
 KEY_TO_COLUMN_MAPPING = {
     "agencyCode": "agency_cd",
     "siteNumber": "site_no",
@@ -95,5 +98,6 @@ def write_transaction(fd, location, transaction_type=''):
     fd.write('DONE')
 
 
-
-
+def upload_to_s3(payload, destination_key, bucket='mlr-exports', region='us-west-2'):
+    s3_client = boto3.client('s3', region_name=region)
+    s3_client.upload_fileobj(payload, bucket, destination_key)

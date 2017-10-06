@@ -5,8 +5,8 @@ from unittest import TestCase
 
 from export_utils import transaction_file_name, write_transaction
 
-class TestTransactionFileName(TestCase):
 
+class TestTransactionFileName(TestCase):
 
     def test_no_site_number(self):
         self.assertEqual(transaction_file_name({'agencyCode': 'USGS', 'updated': '2017-10-03 13:30:45'}), 'mlr..20171003133045')
