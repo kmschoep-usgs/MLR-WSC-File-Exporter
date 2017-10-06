@@ -1,5 +1,4 @@
 from io import BytesIO
-import os
 
 from flask import request
 from flask_restplus import Api, Resource, fields
@@ -101,14 +100,15 @@ def _process_post(location, transaction_type=''):
        }, 400
 
     else:
+        file_name = transaction_file_name(location)
+        output_fd = BytesIO()
+        write_transaction(output_fd, location, transaction_type=transaction_type)
+        tiername = application.config['tiername']
         try:
-            output_fd = BytesIO()
-        except IOError:
+            upload_to_s3(output_fd, 'transactions/{0}/{1}'.format(tiername, file_name))
+        except OSError:
             return 'Unable to write the file', 500
         else:
-            with output_fd:
-                write_transaction(output_fd, location, transaction_type=transaction_type)
-            upload_to_s3(output_fd, 'transactions/qa/')
             return None, 200
 
 

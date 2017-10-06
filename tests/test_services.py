@@ -4,9 +4,10 @@ from unittest import TestCase, mock
 import app
 
 
+@mock.patch('export_utils.boto3.client')
 @mock.patch('services.write_transaction')
-@mock.patch('builtins.open', new_callable=mock.mock_open)
 class AddFileExportTestCase(TestCase):
+
     def setUp(self):
         app.application.testing = True
         app.application.config['EXPORT_DIRECTORY'] = '/tmp'
@@ -74,16 +75,18 @@ class AddFileExportTestCase(TestCase):
             "minorCivilDivisionCode": None
         }
 
-    def test_good_location(self, mopen, mtransaction):
+    def test_good_location(self, mtransaction, mclient):
         response = self.app_client.post('/file_export/add',
                                         content_type='application/json',
                                         data=json.dumps(self.location))
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.return_value = None
+        mclient.return_value = s3_connection_mock
         self.assertEqual(response.status_code, 200)
-        mopen.assert_called_with('/tmp/mlr.filename', 'w')
         self.assertEqual(mtransaction.call_args[0][1], self.location)
         self.assertEqual(mtransaction.call_args[1].get('transaction_type'), 'Create')
 
-    def test_location_with_missing_keys(self, mopen, mtransaction):
+    def test_location_with_missing_keys(self, mtransaction, mclient):
         del self.location['wellDepth']
         del self.location['holeDepth']
         response = self.app_client.post('/file_export/add',
@@ -92,16 +95,17 @@ class AddFileExportTestCase(TestCase):
         self.assertEqual(response.status_code, 400)
         resp_data = json.loads(response.data)
 
-    def test_unable_to_write_file(self, mopen, mtransaction):
-        mopen.side_effect = IOError
+    def test_unable_to_write_file(self, mtransaction, mclient):
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.side_effect = OSError
+        mclient.return_value = s3_connection_mock
         response = self.app_client.post('/file_export/add',
                                         content_type='application/json',
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 500)
 
-
+@mock.patch('export_utils.boto3.client')
 @mock.patch('services.write_transaction')
-@mock.patch('builtins.open', new_callable=mock.mock_open)
 class UpdateFileExportTestCase(TestCase):
     def setUp(self):
         app.application.testing = True
@@ -170,16 +174,15 @@ class UpdateFileExportTestCase(TestCase):
             "minorCivilDivisionCode": None
         }
 
-    def test_good_location(self, mopen, mtransaction):
+    def test_good_location(self, mtransaction, mclient):
         response = self.app_client.post('/file_export/update',
                                         content_type='application/json',
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 200)
-        mopen.assert_called_with('/tmp/mlr.filename', 'w')
         self.assertEqual(mtransaction.call_args[0][1], self.location)
         self.assertEqual(mtransaction.call_args[1].get('transaction_type'), 'Update')
 
-    def test_location_with_missing_keys(self, mopen, mtransaction):
+    def test_location_with_missing_keys(self, mtransaction, mclient):
         del self.location['wellDepth']
         del self.location['holeDepth']
         response = self.app_client.post('/file_export/add',
@@ -188,8 +191,10 @@ class UpdateFileExportTestCase(TestCase):
         self.assertEqual(response.status_code, 400)
         resp_data = json.loads(response.data)
 
-    def test_unable_to_write_file(self, mopen, mtransaction):
-        mopen.side_effect = IOError
+    def test_unable_to_write_file(self, mtransaction, mclient):
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.side_effect = OSError
+        mclient.return_value = s3_connection_mock
         response = self.app_client.post('/file_export/add',
                                         content_type='application/json',
                                         data=json.dumps(self.location))
