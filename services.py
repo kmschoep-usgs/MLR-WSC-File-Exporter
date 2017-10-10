@@ -115,7 +115,7 @@ def _process_post(location, transaction_type=''):
         except (OSError, ValueError, ParamValidationError):
             return 'Unable to write the file', 500
         else:
-            return 'File written to s3://mlr-exports/{}'.format(destination_key), 200
+            return 'File written to s3://{0}/{1}'.format(s3_bucket, destination_key), 200
 
 
 @api.route('/file_export/add')

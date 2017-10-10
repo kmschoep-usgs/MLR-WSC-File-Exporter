@@ -207,7 +207,6 @@ class UpdateFileExportTestCase(TestCase):
                                         content_type='application/json',
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 400)
-        resp_data = json.loads(response.data)
 
     def test_s3_upload_oserror(self, mtransaction, mclient):
         s3_connection_mock = mock.Mock()
