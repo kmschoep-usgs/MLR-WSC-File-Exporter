@@ -212,7 +212,7 @@ class UpdateFileExportTestCase(TestCase):
         s3_connection_mock = mock.Mock()
         s3_connection_mock.upload_fileobj.side_effect = OSError
         mclient.return_value = s3_connection_mock
-        response = self.app_client.post('/file_export/add',
+        response = self.app_client.post('/file_export/update',
                                         content_type='application/json',
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 500)
@@ -221,7 +221,7 @@ class UpdateFileExportTestCase(TestCase):
         s3_connection_mock = mock.Mock()
         s3_connection_mock.upload_fileobj.side_effect = ValueError
         mclient.return_value = s3_connection_mock
-        response = self.app_client.post('/file_export/add',
+        response = self.app_client.post('/file_export/update',
                                         content_type='application/json',
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 500)
@@ -230,7 +230,7 @@ class UpdateFileExportTestCase(TestCase):
         s3_connection_mock = mock.Mock()
         s3_connection_mock.upload_fileobj.side_effect = ParamValidationError(report='Some validation error')
         mclient.return_value = s3_connection_mock
-        response = self.app_client.post('/file_export/add',
+        response = self.app_client.post('/file_export/update',
                                         content_type='application/json',
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 500)
