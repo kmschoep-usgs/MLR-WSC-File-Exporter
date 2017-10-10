@@ -104,9 +104,9 @@ def _process_post(location, transaction_type=''):
     else:
         file_name = transaction_file_name(location)
         output_fd = BytesIO()
-        tiername = application.config['tiername']
-        s3_bucket = application.config['s3_bucket']
-        aws_region = application.config['aws_region']
+        tiername = application.config['TIERNAME']
+        s3_bucket = application.config['S3_BUCKET']
+        aws_region = application.config['AWS_REGION']
         destination_key = 'transactions/{0}/{1}'.format(tiername, file_name)
         write_transaction(output_fd, location, transaction_type=transaction_type)
         output_fd.seek(0)
