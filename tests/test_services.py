@@ -1,15 +1,17 @@
 import json
 from unittest import TestCase, mock
 
+from botocore.exceptions import ParamValidationError
+
 import app
 
-@mock.patch('services.transaction_file_name', return_value='mlr.filename')
+
+@mock.patch('export_utils.boto3.client')
 @mock.patch('services.write_transaction')
-@mock.patch('builtins.open', new_callable=mock.mock_open)
 class AddFileExportTestCase(TestCase):
+
     def setUp(self):
         app.application.testing = True
-        app.application.config['EXPORT_DIRECTORY'] = '/tmp'
         self.app_client = app.application.test_client()
 
         self.location = {
@@ -74,39 +76,58 @@ class AddFileExportTestCase(TestCase):
             "minorCivilDivisionCode": None
         }
 
-    def test_good_location(self, mopen, mtransaction, mfile_name):
+    def test_good_upload(self, mtransaction, mclient):
         response = self.app_client.post('/file_export/add',
                                         content_type='application/json',
                                         data=json.dumps(self.location))
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.return_value = None
+        mclient.return_value = s3_connection_mock
         self.assertEqual(response.status_code, 200)
-        mopen.assert_called_with('/tmp/mlr.filename', 'w')
         self.assertEqual(mtransaction.call_args[0][1], self.location)
         self.assertEqual(mtransaction.call_args[1].get('transaction_type'), 'Create')
 
-    def test_location_with_missing_keys(self, mopen, mtransaction, mfile_name):
+    def test_location_with_missing_keys(self, mtransaction, mclient):
         del self.location['wellDepth']
         del self.location['holeDepth']
         response = self.app_client.post('/file_export/add',
                                         content_type='application/json',
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 400)
-        resp_data = json.loads(response.data)
 
-    def test_unable_to_write_file(self, mopen, mtransaction, mfile_name):
-        mopen.side_effect = IOError
+    def test_s3_upload_oserror(self, mtransaction, mclient):
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.side_effect = OSError
+        mclient.return_value = s3_connection_mock
+        response = self.app_client.post('/file_export/add',
+                                        content_type='application/json',
+                                        data=json.dumps(self.location))
+        self.assertEqual(response.status_code, 500)
+
+    def test_s3_upload_valueerror(self, mtransaction, mclient):
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.side_effect = ValueError
+        mclient.return_value = s3_connection_mock
+        response = self.app_client.post('/file_export/add',
+                                        content_type='application/json',
+                                        data=json.dumps(self.location))
+        self.assertEqual(response.status_code, 500)
+
+    def test_s3_upload_paramvalidationerror(self, mtransaction, mclient):
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.side_effect = ParamValidationError(report='Some validation error')
+        mclient.return_value = s3_connection_mock
         response = self.app_client.post('/file_export/add',
                                         content_type='application/json',
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 500)
 
 
-@mock.patch('services.transaction_file_name', return_value='mlr.filename')
+@mock.patch('export_utils.boto3.client')
 @mock.patch('services.write_transaction')
-@mock.patch('builtins.open', new_callable=mock.mock_open)
 class UpdateFileExportTestCase(TestCase):
     def setUp(self):
         app.application.testing = True
-        app.application.config['EXPORT_DIRECTORY'] = '/tmp'
         self.app_client = app.application.test_client()
 
         self.location = {
@@ -171,26 +192,44 @@ class UpdateFileExportTestCase(TestCase):
             "minorCivilDivisionCode": None
         }
 
-    def test_good_location(self, mopen, mtransaction, mfile_name):
+    def test_good_location(self, mtransaction, mclient):
         response = self.app_client.post('/file_export/update',
                                         content_type='application/json',
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 200)
-        mopen.assert_called_with('/tmp/mlr.filename', 'w')
         self.assertEqual(mtransaction.call_args[0][1], self.location)
         self.assertEqual(mtransaction.call_args[1].get('transaction_type'), 'Update')
 
-    def test_location_with_missing_keys(self, mopen, mtransaction, mfile_name):
+    def test_location_with_missing_keys(self, mtransaction, mclient):
         del self.location['wellDepth']
         del self.location['holeDepth']
         response = self.app_client.post('/file_export/add',
                                         content_type='application/json',
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 400)
-        resp_data = json.loads(response.data)
 
-    def test_unable_to_write_file(self, mopen, mtransaction, mfile_name):
-        mopen.side_effect = IOError
+    def test_s3_upload_oserror(self, mtransaction, mclient):
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.side_effect = OSError
+        mclient.return_value = s3_connection_mock
+        response = self.app_client.post('/file_export/add',
+                                        content_type='application/json',
+                                        data=json.dumps(self.location))
+        self.assertEqual(response.status_code, 500)
+
+    def test_s3_upload_valueerror(self, mtransaction, mclient):
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.side_effect = ValueError
+        mclient.return_value = s3_connection_mock
+        response = self.app_client.post('/file_export/add',
+                                        content_type='application/json',
+                                        data=json.dumps(self.location))
+        self.assertEqual(response.status_code, 500)
+
+    def test_s3_upload_paramvalidationerror(self, mtransaction, mclient):
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.side_effect = ParamValidationError(report='Some validation error')
+        mclient.return_value = s3_connection_mock
         response = self.app_client.post('/file_export/add',
                                         content_type='application/json',
                                         data=json.dumps(self.location))

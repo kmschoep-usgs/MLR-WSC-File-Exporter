@@ -1,11 +1,11 @@
-from io import StringIO
-import os
+from io import BytesIO
 
+from botocore.exceptions import ParamValidationError
 from flask import request
-from flask_restplus import Api, Resource, fields, marshal, reqparse
+from flask_restplus import Api, Resource, fields
 
 from app import application
-from export_utils import write_transaction, transaction_file_name
+from export_utils import write_transaction, transaction_file_name, upload_to_s3
 
 api = Api(application,
           title='MLR WSC File Exporter',
@@ -77,6 +77,7 @@ location_model = api.model('LocationModel', {
 
 expected_keys = set(iter(location_model.keys()))
 
+
 def _missing_keys(json_data):
     '''
 
@@ -102,14 +103,19 @@ def _process_post(location, transaction_type=''):
 
     else:
         file_name = transaction_file_name(location)
+        output_fd = BytesIO()
+        tiername = application.config['TIERNAME']
+        s3_bucket = application.config['S3_BUCKET']
+        aws_region = application.config['AWS_REGION']
+        destination_key = 'transactions/{0}/{1}'.format(tiername, file_name)
+        write_transaction(output_fd, location, transaction_type=transaction_type)
+        output_fd.seek(0)
         try:
-            output_fd = open(os.path.join(application.config['EXPORT_DIRECTORY'], file_name), 'w')
-        except IOError:
+            upload_to_s3(output_fd, destination_key, s3_bucket, aws_region)
+        except (OSError, ValueError, ParamValidationError):
             return 'Unable to write the file', 500
         else:
-            with output_fd:
-                write_transaction(output_fd, location, transaction_type=transaction_type)
-            return None, 200
+            return 'File written to s3://{0}/{1}'.format(s3_bucket, destination_key), 200
 
 
 @api.route('/file_export/add')
