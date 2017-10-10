@@ -150,6 +150,9 @@ class TestWriteTransaction(TestCase):
         "DONE"
         )
 
+    def tearDown(self):
+        self.fd.close()
+
     def test_empty_dict(self):
         write_transaction(self.fd, {}, transaction_type='Create')
         self.assertEqual(self.fd.getvalue(), 'trans_type=Create\nDONE'.encode())
@@ -167,6 +170,9 @@ class TestUploadToS3(TestCase):
         self.destination_key = 'transaction/test/file.txt'
         self.bucket = 'fake-bucket'
         self.region = 'us-west-2'
+
+    def tearDown(self):
+        self.payload.close()
 
     @patch('export_utils.boto3.client')
     def test_upload(self, mock_client):
