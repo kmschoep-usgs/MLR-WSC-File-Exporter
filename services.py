@@ -1,4 +1,5 @@
 from io import BytesIO
+import pkg_resources
 
 from botocore.exceptions import ParamValidationError
 from flask import request
@@ -79,27 +80,25 @@ expected_keys = set(iter(location_model.keys()))
 
 
 def _missing_keys(json_data):
-    '''
-
+    """
     :param dict json_data:
     :return: list of strings - missing keys
-    '''
+    """
     request_keys = set(iter(json_data.keys()))
     return expected_keys.difference(request_keys)
 
 
 def _process_post(location, transaction_type=''):
-    '''
-
+    """
     :param dict location:
     :param str transaction_type: Will be assigned to the 'trans_type' field in the exported file
     :return: tuple (response_data, response_status)
-    '''
+    """
     missing_keys = _missing_keys(location)
     if missing_keys:
         return {
            'error_message': 'Missing keys: {0}'.format(', '.join(missing_keys))
-       }, 400
+        }, 400
 
     else:
         file_name = transaction_file_name(location)
@@ -138,3 +137,29 @@ class UpdateFileExporter(Resource):
     @api.expect(location_model)
     def post(self):
         return _process_post(request.get_json(), transaction_type='Update')
+
+
+version_model = api.model('VersionModel', {
+    'version': fields.String,
+    'artifact': fields.String
+})
+
+
+@api.route('/version')
+class Version(Resource):
+
+    @api.response(200, 'Success', version_model)
+    def get(self):
+        try:
+            distribution = pkg_resources.get_distribution('usgs_wma_mlr_wsc_file_exporter')
+        except pkg_resources.DistributionNotFound:
+            resp = {
+                "version": "local_development",
+                "artifact": None
+            }
+        else:
+            resp = {
+                "version": distribution.version,
+                "artifact": distribution.project_name
+            }
+        return resp
