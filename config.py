@@ -8,8 +8,7 @@ S3_BUCKET = os.getenv('S3_BUCKET', 'mlr-exports')
 AWS_REGION = os.getenv('AWS_REGION', 'us-west-2')
 TIERNAME = os.getenv('TIERNAME', 'development')
 
-# The following five variables configure authentication
-# The following four variables configure authentication
+# The following six variables configure authentication
 
 # If using a public key, set the environment variable AUTH_TOKEN_KEY_URL to the url where it can be retrieved
 AUTH_TOKEN_KEY_URL = os.getenv('auth_token_key_url')
@@ -27,3 +26,6 @@ JWT_ROLE_CLAIM = get_roles
 
 # Set the path
 AUTH_CERT_PATH = os.getenv('auth_cert_path', True)
+
+# Set the allowed_roles
+AUTHORIZED_ROLES = [role.strip() for role in os.getenv('authorized_roles', '').split(',')]
