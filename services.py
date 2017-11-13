@@ -23,7 +23,6 @@ api = Api(application,
           description='Provides a service whose payload is a JSON legacy location object and writes out a MLR legacy output file',
           default='WSC File Export',
           doc='/api',
-          security='apiKey',
           authorizations=authorizations
           )
 
@@ -140,6 +139,7 @@ class AddFileExporter(Resource):
     @api.response(400, "Bad request")
     @api.response(401, 'Not authorized')
     @api.response(500, "Unable to write the file")
+    @api.doc(security='apikey')
     @api.expect(location_model)
     @jwt_role_required(application.config['AUTHORIZED_ROLES'])
     def post(self):
@@ -153,6 +153,7 @@ class UpdateFileExporter(Resource):
     @api.response(400, "Bad request")
     @api.response(401, 'Not authorized')
     @api.response(500, "Unable to write the file")
+    @api.doc(security='apikey')
     @api.expect(location_model)
     @jwt_role_required(application.config['AUTHORIZED_ROLES'])
     def post(self):
