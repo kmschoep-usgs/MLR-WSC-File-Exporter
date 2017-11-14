@@ -1,9 +1,10 @@
 import json
+import os
 from unittest import TestCase, mock
 
 from botocore.exceptions import ParamValidationError
+import jwt
 
-import app
 
 
 @mock.patch('export_utils.boto3.client')
@@ -11,6 +12,15 @@ import app
 class AddFileExportTestCase(TestCase):
 
     def setUp(self):
+        os.environ['authorized_roles'] = 'admin, developer'
+
+        import app
+        app.application.config['JWT_SECRET_KEY'] = 'secret'
+        app.application.config['JWT_PUBLIC_KEY'] = None
+        app.application.config['JWT_ALGORITHM'] = 'HS256'
+        app.application.config['AUTH_TOKEN_KEY_URL'] = ''
+        app.application.config['JWT_DECODE_AUDIENCE'] = None
+
         app.application.testing = True
         self.app_client = app.application.test_client()
 
@@ -77,48 +87,94 @@ class AddFileExportTestCase(TestCase):
         }
 
     def test_good_upload(self, mtransaction, mclient):
-        response = self.app_client.post('/file_export/add',
-                                        content_type='application/json',
-                                        data=json.dumps(self.location))
+        good_token = jwt.encode({'authorities': ['developer', 'tester']}, 'secret', algorithm='HS256')
         s3_connection_mock = mock.Mock()
         s3_connection_mock.upload_fileobj.return_value = None
         mclient.return_value = s3_connection_mock
+        response = self.app_client.post('/file_export/add',
+                                        content_type='application/json',
+                                        headers={'Authorization': 'Bearer {0}'.format(good_token.decode('utf-8'))},
+                                        data=json.dumps(self.location))
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(mtransaction.call_args[0][1], self.location)
         self.assertEqual(mtransaction.call_args[1].get('transaction_type'), 'Create')
 
+    def test_no_auth_header(self, mtransaction, mclient):
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.return_value = None
+        mclient.return_value = s3_connection_mock
+        response = self.app_client.post('/file_export/add',
+                                        content_type='application/json',
+                                        data=json.dumps(self.location))
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_bad_token(self, mtransaction, mclient):
+        bad_token = jwt.encode({'authorities': ['developer', 'tester']}, 'bad_secret', algorithm='HS256')
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.return_value = None
+        mclient.return_value = s3_connection_mock
+        response = self.app_client.post('/file_export/add',
+                                        content_type='application/json',
+                                        headers={'Authorization': 'Bearer {0}'.format(bad_token.decode('utf-8'))},
+                                        data=json.dumps(self.location))
+
+        self.assertEqual(response.status_code, 422)
+
+    def test_not_authorized(self, mtransaction, mclient):
+        good_token = jwt.encode({'authorities': ['student', 'tester']}, 'secret', algorithm='HS256')
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.return_value = None
+        mclient.return_value = s3_connection_mock
+        response = self.app_client.post('/file_export/add',
+                                        content_type='application/json',
+                                        headers={'Authorization': 'Bearer {0}'.format(good_token.decode('utf-8'))},
+                                        data=json.dumps(self.location))
+
+        self.assertEqual(response.status_code, 401)
+
+
     def test_location_with_missing_keys(self, mtransaction, mclient):
+        good_token = jwt.encode({'authorities': ['developer', 'tester']}, 'secret', algorithm='HS256')
         del self.location['wellDepth']
         del self.location['holeDepth']
         response = self.app_client.post('/file_export/add',
                                         content_type='application/json',
+                                        headers={'Authorization': 'Bearer {0}'.format(good_token.decode('utf-8'))},
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 400)
 
     def test_s3_upload_oserror(self, mtransaction, mclient):
+        good_token = jwt.encode({'authorities': ['developer', 'tester']}, 'secret', algorithm='HS256')
         s3_connection_mock = mock.Mock()
         s3_connection_mock.upload_fileobj.side_effect = OSError
         mclient.return_value = s3_connection_mock
         response = self.app_client.post('/file_export/add',
                                         content_type='application/json',
+                                        headers={'Authorization': 'Bearer {0}'.format(good_token.decode('utf-8'))},
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 500)
 
     def test_s3_upload_valueerror(self, mtransaction, mclient):
+        good_token = jwt.encode({'authorities': ['developer', 'tester']}, 'secret', algorithm='HS256')
         s3_connection_mock = mock.Mock()
         s3_connection_mock.upload_fileobj.side_effect = ValueError
         mclient.return_value = s3_connection_mock
         response = self.app_client.post('/file_export/add',
                                         content_type='application/json',
+                                        headers={'Authorization': 'Bearer {0}'.format(good_token.decode('utf-8'))},
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 500)
 
     def test_s3_upload_paramvalidationerror(self, mtransaction, mclient):
+        good_token = jwt.encode({'authorities': ['developer', 'tester']}, 'secret', algorithm='HS256')
         s3_connection_mock = mock.Mock()
         s3_connection_mock.upload_fileobj.side_effect = ParamValidationError(report='Some validation error')
         mclient.return_value = s3_connection_mock
         response = self.app_client.post('/file_export/add',
                                         content_type='application/json',
+                                        headers={'Authorization': 'Bearer {0}'.format(good_token.decode('utf-8'))},
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 500)
 
@@ -127,6 +183,15 @@ class AddFileExportTestCase(TestCase):
 @mock.patch('services.write_transaction')
 class UpdateFileExportTestCase(TestCase):
     def setUp(self):
+        os.environ['authorized_roles'] = 'admin, developer'
+
+        import app
+        app.application.config['JWT_SECRET_KEY'] = 'secret'
+        app.application.config['JWT_PUBLIC_KEY'] = None
+        app.application.config['JWT_ALGORITHM'] = 'HS256'
+        app.application.config['AUTH_TOKEN_KEY_URL'] = ''
+        app.application.config['JWT_DECODE_AUDIENCE'] = None
+
         app.application.testing = True
         self.app_client = app.application.test_client()
 
@@ -192,45 +257,93 @@ class UpdateFileExportTestCase(TestCase):
             "minorCivilDivisionCode": None
         }
 
-    def test_good_location(self, mtransaction, mclient):
+    def test_good_upload(self, mtransaction, mclient):
+        good_token = jwt.encode({'authorities': ['developer', 'tester']}, 'secret', algorithm='HS256')
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.return_value = None
+        mclient.return_value = s3_connection_mock
         response = self.app_client.post('/file_export/update',
                                         content_type='application/json',
+                                        headers={'Authorization': 'Bearer {0}'.format(good_token.decode('utf-8'))},
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(mtransaction.call_args[0][1], self.location)
         self.assertEqual(mtransaction.call_args[1].get('transaction_type'), 'Update')
 
+    def test_no_auth_header(self, mtransaction, mclient):
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.return_value = None
+        mclient.return_value = s3_connection_mock
+        response = self.app_client.post('/file_export/update',
+                                        content_type='application/json',
+                                        data=json.dumps(self.location))
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_bad_token(self, mtransaction, mclient):
+        bad_token = jwt.encode({'authorities': ['developer', 'tester']}, 'bad_secret', algorithm='HS256')
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.return_value = None
+        mclient.return_value = s3_connection_mock
+        response = self.app_client.post('/file_export/update',
+                                        content_type='application/json',
+                                        headers={'Authorization': 'Bearer {0}'.format(bad_token.decode('utf-8'))},
+                                        data=json.dumps(self.location))
+
+        self.assertEqual(response.status_code, 422)
+
+    def test_not_authorized(self, mtransaction, mclient):
+        good_token = jwt.encode({'authorities': ['student', 'tester']}, 'secret', algorithm='HS256')
+        s3_connection_mock = mock.Mock()
+        s3_connection_mock.upload_fileobj.return_value = None
+        mclient.return_value = s3_connection_mock
+        response = self.app_client.post('/file_export/update',
+                                        content_type='application/json',
+                                        headers={'Authorization': 'Bearer {0}'.format(good_token.decode('utf-8'))},
+                                        data=json.dumps(self.location))
+
+        self.assertEqual(response.status_code, 401)
+
+
     def test_location_with_missing_keys(self, mtransaction, mclient):
+        good_token = jwt.encode({'authorities': ['developer', 'tester']}, 'secret', algorithm='HS256')
         del self.location['wellDepth']
         del self.location['holeDepth']
         response = self.app_client.post('/file_export/add',
                                         content_type='application/json',
+                                        headers={'Authorization': 'Bearer {0}'.format(good_token.decode('utf-8'))},
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 400)
 
     def test_s3_upload_oserror(self, mtransaction, mclient):
+        good_token = jwt.encode({'authorities': ['developer', 'tester']}, 'secret', algorithm='HS256')
         s3_connection_mock = mock.Mock()
         s3_connection_mock.upload_fileobj.side_effect = OSError
         mclient.return_value = s3_connection_mock
         response = self.app_client.post('/file_export/update',
                                         content_type='application/json',
+                                        headers={'Authorization': 'Bearer {0}'.format(good_token.decode('utf-8'))},
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 500)
 
     def test_s3_upload_valueerror(self, mtransaction, mclient):
+        good_token = jwt.encode({'authorities': ['developer', 'tester']}, 'secret', algorithm='HS256')
         s3_connection_mock = mock.Mock()
         s3_connection_mock.upload_fileobj.side_effect = ValueError
         mclient.return_value = s3_connection_mock
         response = self.app_client.post('/file_export/update',
                                         content_type='application/json',
+                                        headers={'Authorization': 'Bearer {0}'.format(good_token.decode('utf-8'))},
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 500)
 
     def test_s3_upload_paramvalidationerror(self, mtransaction, mclient):
+        good_token = jwt.encode({'authorities': ['developer', 'tester']}, 'secret', algorithm='HS256')
         s3_connection_mock = mock.Mock()
         s3_connection_mock.upload_fileobj.side_effect = ParamValidationError(report='Some validation error')
         mclient.return_value = s3_connection_mock
         response = self.app_client.post('/file_export/update',
                                         content_type='application/json',
+                                        headers={'Authorization': 'Bearer {0}'.format(good_token.decode('utf-8'))},
                                         data=json.dumps(self.location))
         self.assertEqual(response.status_code, 500)

@@ -7,12 +7,27 @@ from flask_restplus import Api, Resource, fields
 
 from app import application
 from export_utils import write_transaction, transaction_file_name, upload_to_s3
+from flask_restplus_jwt import JWTRestplusManager, jwt_role_required
+
+# This will add the Authorize button to the swagger docs
+authorizations = {
+    'apikey': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization'
+    }
+}
 
 api = Api(application,
           title='MLR WSC File Exporter',
           description='Provides a service whose payload is a JSON legacy location object and writes out a MLR legacy output file',
           default='WSC File Export',
-          doc='/api')
+          doc='/api',
+          authorizations=authorizations
+          )
+
+# Setup the Flask-JWT-Simple extension
+jwt = JWTRestplusManager(api, application)
 
 location_model = api.model('LocationModel', {
     "agencyCode": fields.String,
@@ -122,8 +137,11 @@ class AddFileExporter(Resource):
 
     @api.response(200, "Successfully wrote transaction file")
     @api.response(400, "Bad request")
+    @api.response(401, 'Not authorized')
     @api.response(500, "Unable to write the file")
+    @api.doc(security='apikey')
     @api.expect(location_model)
+    @jwt_role_required(application.config['AUTHORIZED_ROLES'])
     def post(self):
         return _process_post(request.get_json(), transaction_type='Create')
 
@@ -133,8 +151,11 @@ class UpdateFileExporter(Resource):
 
     @api.response(200, "Successfully wrote transaction file")
     @api.response(400, "Bad request")
+    @api.response(401, 'Not authorized')
     @api.response(500, "Unable to write the file")
+    @api.doc(security='apikey')
     @api.expect(location_model)
+    @jwt_role_required(application.config['AUTHORIZED_ROLES'])
     def post(self):
         return _process_post(request.get_json(), transaction_type='Update')
 

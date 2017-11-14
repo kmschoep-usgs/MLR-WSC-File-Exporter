@@ -40,5 +40,5 @@ setup(name='usgs_wma_mlr_wsc_file_exporter',
       test_loader='unittest:TestLoader',
       platforms='any',
       zip_safe=False,
-      py_modules=['app', 'config', 'services', 'export_utils']
+      py_modules=['app', 'config', 'services', 'export_utils', 'flask_restplus_jwt']
       )
