@@ -5,9 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html). (Patch version X.Y.0 is implied if not specified.)
 
 ## [Unreleased]
+
+## [0.5.0] - 2017-11-20
 ### Added
 - GET endpoint /version to show the current version and artifact name
-- Authorization for /file_export/add and /file_export/update 
+- Authorization for /file_export/add and /file_export/update
+- HTTPS Support
 
 ## [0.4.0] - 2017-11-01
 
