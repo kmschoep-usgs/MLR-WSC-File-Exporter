@@ -29,7 +29,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - POST endpoint /file_export/update which creates an update transaction file for the location in the payload.
 - Swagger docs endpoint /api
 
-[Unreleased]: https://github.com/USGS-CIDA/MLR-WSC-File-Exporter/compare/MLR-WSC-File-Exporter-0.4.0...master
+[Unreleased]: https://github.com/USGS-CIDA/MLR-WSC-File-Exporter/compare/MLR-WSC-File-Exporter-0.5.0...master
+[0.5.0]: https://github.com/USGS-CIDA/MLR-WSC-File-Exporter/compare/MLR-WSC-File-Exporter-0.4.0...MLR-WSC-File-Exporter-0.5.0
 [0.4.0]: https://github.com/USGS-CIDA/MLR-WSC-File-Exporter/compare/MLR-WSC-File-Exporter-0.3.0...MLR-WSC-File-Exporter-0.4.0
 [0.3.0]: https://github.com/USGS-CIDA/MLR-WSC-File-Exporter/compare/MLR-WSC-File-Exporter-0.2.0...MLR-WSC-File-Exporter-0.3.0
 
