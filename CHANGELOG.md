@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Dockerfile Healthcheck
 
+### Removed
+- Dockerfile 
+- Dockerfile-DOI
+- gunicorn_config.py
+
 ## [0.5.0] - 2017-11-20
 ### Added
 - GET endpoint /version to show the current version and artifact name

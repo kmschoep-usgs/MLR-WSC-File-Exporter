@@ -105,3 +105,4 @@ ENV/
 
 # crt file for docker
 root.crt
+/.project
