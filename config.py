@@ -11,7 +11,7 @@ TIERNAME = os.getenv('TIERNAME', 'development')
 # The following six variables configure authentication
 
 # If using a public key, set the environment variable AUTH_TOKEN_KEY_URL to the url where it can be retrieved
-AUTH_TOKEN_KEY_URL = os.getenv('auth_token_key_url')
+AUTH_TOKEN_KEY_URL = os.getenv('oauthResourceTokenKeyUri')
 
 # If using the above, use the AUTH_TOKEN_KEY_ALGORITHM to set the algorithm. By default it will be RS256
 JWT_ALGORITHM = os.getenv('jwt_algorithm', 'HS256')
@@ -25,7 +25,7 @@ def get_roles(dict):
 JWT_ROLE_CLAIM = get_roles
 
 # Set the path
-AUTH_CERT_PATH = os.getenv('auth_cert_path', True)
+AUTH_CERT_PATH = os.getenv('oauthClientSecret', True)
 
 # Set the allowed_roles
 AUTHORIZED_ROLES = [role.strip() for role in os.getenv('authorized_roles', '').split(',')]
