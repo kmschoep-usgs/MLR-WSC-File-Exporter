@@ -25,7 +25,7 @@ def get_roles(dict):
 JWT_ROLE_CLAIM = get_roles
 
 # Set the path
-AUTH_CERT_PATH = os.getenv('oauthClientSecret', True)
+AUTH_CERT_PATH = os.getenv('ssl_cert_path', True)
 
 # Set the allowed_roles
 AUTHORIZED_ROLES = [role.strip() for role in os.getenv('authorized_roles', '').split(',')]
