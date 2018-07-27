@@ -171,7 +171,7 @@ class TestUploadToS3(TestCase):
 
     def setUp(self):
         self.payload = BytesIO(b'some text')
-        self.destination_key = 'transaction/test/file.txt'
+        self.destination_key = 'transaction/file.txt'
         self.bucket = 'fake-bucket'
         self.region = 'us-west-2'
 

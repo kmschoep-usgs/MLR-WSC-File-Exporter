@@ -4,9 +4,8 @@ PROJECT_DIR = PROJECT_DIR = os.path.dirname(__file__)
 DEBUG = False
 
 # These configuration parameters configure where the file that is created is written to.
-S3_BUCKET = os.getenv('S3_BUCKET', 'mlr-exports')
+S3_BUCKET = os.getenv('S3_BUCKET', 'mlr-exports') + '-' + os.getenv('TIERNAME', 'development')
 AWS_REGION = os.getenv('AWS_REGION', 'us-west-2')
-TIERNAME = os.getenv('TIERNAME', 'development')
 
 # The following six variables configure authentication
 
