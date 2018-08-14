@@ -5,11 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html). (Patch version X.Y.0 is implied if not specified.)
 
 ## [Unreleased]
+
+### Updated
+- isuftin@usgs.gov - Updated the version constraint for pyca/cryptography due to
+CVE https://nvd.nist.gov/vuln/detail/CVE-2018-10903
+
 ### Added
 - Dockerfile Healthcheck
 
 ### Removed
-- Dockerfile 
+- Dockerfile
 - Dockerfile-DOI
 - gunicorn_config.py
 
@@ -40,4 +45,3 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 [0.5.0]: https://github.com/USGS-CIDA/MLR-WSC-File-Exporter/compare/MLR-WSC-File-Exporter-0.4.0...MLR-WSC-File-Exporter-0.5.0
 [0.4.0]: https://github.com/USGS-CIDA/MLR-WSC-File-Exporter/compare/MLR-WSC-File-Exporter-0.3.0...MLR-WSC-File-Exporter-0.4.0
 [0.3.0]: https://github.com/USGS-CIDA/MLR-WSC-File-Exporter/compare/MLR-WSC-File-Exporter-0.2.0...MLR-WSC-File-Exporter-0.3.0
-
