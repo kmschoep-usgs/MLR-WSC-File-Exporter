@@ -120,15 +120,19 @@ def _process_post(location, transaction_type=''):
         output_fd = BytesIO()
         s3_bucket = application.config['S3_BUCKET']
         aws_region = application.config['AWS_REGION']
+        do_s3_upload = application.config['DO_UPLOAD_TO_S3']
         destination_key = 'transactions/{0}'.format(file_name)
         write_transaction(output_fd, location, transaction_type=transaction_type)
         output_fd.seek(0)
-        try:
-            upload_to_s3(output_fd, destination_key, s3_bucket, aws_region)
-        except (OSError, ValueError, ParamValidationError):
-            return 'Unable to write the file', 500
+        if do_s3_upload:
+            try:
+                upload_to_s3(output_fd, destination_key, s3_bucket, aws_region)
+            except (OSError, ValueError, ParamValidationError):
+                return 'Unable to write the file', 500
+            else:
+                return 'File written to s3://{0}/{1}'.format(s3_bucket, destination_key), 200\
         else:
-            return 'File written to s3://{0}/{1}'.format(s3_bucket, destination_key), 200
+            return 'File written but not uploaded to s3, per configuration: [DO_UPLOAD_TO_S3 = False]', 200\
 
 
 @api.route('/file_export/add')
