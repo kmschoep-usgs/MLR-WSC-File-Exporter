@@ -130,9 +130,9 @@ def _process_post(location, transaction_type=''):
             except (OSError, ValueError, ParamValidationError):
                 return 'Unable to write the file', 500
             else:
-                return 'File written to s3://{0}/{1}'.format(s3_bucket, destination_key), 200\
+                return 'File written to s3://{0}/{1}'.format(s3_bucket, destination_key), 200
         else:
-            return 'File written but not uploaded to s3, per configuration: [DO_UPLOAD_TO_S3 = False]', 200\
+            return 'File written but not uploaded to s3, per configuration: [DO_UPLOAD_TO_S3 = False]', 200
 
 
 @api.route('/file_export/add')
