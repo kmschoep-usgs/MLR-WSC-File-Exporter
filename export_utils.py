@@ -102,6 +102,6 @@ def write_transaction(fd, location, transaction_type=''):
     fd.write('DONE'.encode())
 
 
-def upload_to_s3(payload, destination_key, bucket, region):
-    s3_client = boto3.client('s3', region_name=region)
+def upload_to_s3(payload, destination_key, bucket, region, endpoint):
+    s3_client = boto3.client('s3', region_name=region, endpoint_url=endpoint)
     s3_client.upload_fileobj(payload, Bucket=bucket, Key=destination_key)

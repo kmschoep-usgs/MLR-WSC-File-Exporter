@@ -174,6 +174,7 @@ class TestUploadToS3(TestCase):
         self.destination_key = 'transaction/file.txt'
         self.bucket = 'fake-bucket'
         self.region = 'us-west-2'
+        self.endpoint = None
 
     def tearDown(self):
         self.payload.close()
@@ -183,8 +184,8 @@ class TestUploadToS3(TestCase):
         s3_connection_mock = Mock()
         s3_connection_mock.upload_fileobj.return_value = None
         mock_client.return_value = s3_connection_mock
-        upload_to_s3(self.payload, self.destination_key, self.bucket, self.region)
-        mock_client.assert_called_with('s3', region_name=self.region)
+        upload_to_s3(self.payload, self.destination_key, self.bucket, self.region, self.endpoint)
+        mock_client.assert_called_with('s3', region_name=self.region, endpoint_url=self.endpoint)
         s3_connection_mock.upload_fileobj.assert_called_with(self.payload,
                                                              Bucket=self.bucket,
                                                              Key=self.destination_key

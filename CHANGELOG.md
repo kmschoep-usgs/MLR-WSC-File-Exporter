@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+- Added a configuration param to override the URL of the S3 service (done to support integration testing so we can use a local mock S3)
+
+## [0.6.0] - 2018-08-23
+
 ### Updated
 - isuftin@usgs.gov - Updated the version constraint for pyca/cryptography due to
 CVE https://nvd.nist.gov/vuln/detail/CVE-2018-10903

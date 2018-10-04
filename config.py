@@ -6,6 +6,7 @@ DEBUG = False
 # These configuration parameters configure where the file that is created is written to.
 S3_BUCKET = os.getenv('S3_BUCKET', 'mlr-exports') + '-' + os.getenv('TIERNAME', 'development')
 AWS_REGION = os.getenv('AWS_REGION', 'us-west-2')
+S3_ENDPOINT_URL = os.getenv('S3_ENDPOINT_URL', None)
 
 # The following six variables configure authentication
 

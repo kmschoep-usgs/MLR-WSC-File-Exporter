@@ -120,11 +120,12 @@ def _process_post(location, transaction_type=''):
         output_fd = BytesIO()
         s3_bucket = application.config['S3_BUCKET']
         aws_region = application.config['AWS_REGION']
+        endpoint = application.config['S3_ENDPOINT_URL']
         destination_key = 'transactions/{0}'.format(file_name)
         write_transaction(output_fd, location, transaction_type=transaction_type)
         output_fd.seek(0)
         try:
-            upload_to_s3(output_fd, destination_key, s3_bucket, aws_region)
+            upload_to_s3(output_fd, destination_key, s3_bucket, aws_region, endpoint)
         except (OSError, ValueError, ParamValidationError):
             return 'Unable to write the file', 500
         else:
