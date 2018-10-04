@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Added
-- Added a configuration param to disable uploading created export files to S3 (done to support integration testing)
+- Added a configuration param to override the URL of the S3 service (done to support integration testing so we can use a local mock S3)
 
 ## [0.6.0] - 2018-08-23
 
