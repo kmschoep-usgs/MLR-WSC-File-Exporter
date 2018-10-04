@@ -102,6 +102,7 @@ ENV/
 
 # IDE files
 .idea/
+.vscode/
 
 # crt file for docker
 root.crt
