@@ -1,5 +1,6 @@
 from io import BytesIO
 import pkg_resources
+import logging
 
 from botocore.exceptions import ParamValidationError
 from flask import request
@@ -126,7 +127,8 @@ def _process_post(location, transaction_type=''):
         output_fd.seek(0)
         try:
             upload_to_s3(output_fd, destination_key, s3_bucket, aws_region, endpoint)
-        except (OSError, ValueError, ParamValidationError):
+        except (OSError, ValueError, ParamValidationError) as err:
+            application.logger.error("An error occurred while attempting to upload the file to S3: " + str(err))
             return 'Unable to write the file', 500
         else:
             return 'File written to s3://{0}/{1}'.format(s3_bucket, destination_key), 200
