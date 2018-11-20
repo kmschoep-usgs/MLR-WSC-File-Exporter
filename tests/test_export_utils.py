@@ -10,19 +10,19 @@ from export_utils import transaction_file_name, write_transaction, upload_to_s3
 class TestTransactionFileName(TestCase):
 
     def test_no_site_number(self):
-        self.assertEqual(transaction_file_name({'agencyCode': 'USGS', 'updated': '2017-10-03 13:30:45'}), 'mlr..20171003133045')
+        self.assertEqual(transaction_file_name({'agencyCode': 'USGS', 'updated': '2017-10-03 13:30:45'}), 'mlr.USGS..20171003133045')
 
     def test_with_site_number(self):
         self.assertEqual(transaction_file_name({'agencyCode': 'USGS', 'siteNumber': '0123456789012', 'updated': '2017-10-03 13:30:45'}),
-                             'mlr.0123456789012.20171003133045')
+                             'mlr.USGS.0123456789012.20171003133045')
 
     def test_with_site_number_with_trailing_spaces(self):
         self.assertEqual(transaction_file_name({'agencyCode': 'USGS', 'siteNumber': '0123456789   ', 'updated': '2017-10-03 13:30:45'}),
-                             'mlr.0123456789.20171003133045')
+                             'mlr.USGS.0123456789.20171003133045')
 
     def test_with_no_updated(self):
         self.assertEqual(transaction_file_name({'agencyCode': 'USGS', 'siteNumber': '0123456789012'}),
-                         'mlr.0123456789012.')
+                         'mlr.USGS.0123456789012.')
 
 
 class TestWriteTransaction(TestCase):
