@@ -22,7 +22,15 @@ class TestTransactionFileName(TestCase):
 
     def test_with_no_updated(self):
         self.assertEqual(transaction_file_name({'agencyCode': 'USGS', 'siteNumber': '0123456789012'}),
-                         'mlr.USGS.0123456789012.')
+                             'mlr.USGS.0123456789012.')
+    
+    def test_remove_spaces_on_right(self):
+            self.assertEqual(transaction_file_name({'agencyCode': 'USGS  ', 'siteNumber': '0123456789012' }),
+                             'mlr.USGS.0123456789012.')
+
+    def test_remove_spaces_on_left(self):
+            self.assertEqual(transaction_file_name({'agencyCode': '  USGS  ', 'siteNumber': '0123456789012' }),
+                             'mlr.USGS.0123456789012.')
 
 
 class TestWriteTransaction(TestCase):
