@@ -16,6 +16,22 @@ To run the tests:
 ```bash
 env/bin/python -m unittest
 ```
+The test output (for success) looks like:
+```
+megan@megan-VirtualBox:~/Documents/mlr/MLR-WSC-File-Exporter$ env/bin/python -m unittest
+............[2018-11-19 10:54:17,956] ERROR in services: An error occurred while attempting to upload the file to S3: 
+.[2018-11-19 10:54:17,960] ERROR in services: An error occurred while attempting to upload the file to S3: Parameter validation failed:
+Some validation error
+.[2018-11-19 10:54:17,963] ERROR in services: An error occurred while attempting to upload the file to S3: 
+......[2018-11-19 10:54:17,993] ERROR in services: An error occurred while attempting to upload the file to S3: 
+.[2018-11-19 10:54:17,996] ERROR in services: An error occurred while attempting to upload the file to S3: Parameter validation failed:
+Some validation error
+.[2018-11-19 10:54:18,005] ERROR in services: An error occurred while attempting to upload the file to S3: 
+.
+----------------------------------------------------------------------
+Ran 23 tests in 0.898s
+OK
+```
 
 To run the application locally execute the following:
 ```bash
