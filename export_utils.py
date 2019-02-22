@@ -77,8 +77,7 @@ def transaction_file_name(location):
     :param dict location:
     :return: str
     '''
-    return 'mlr.{0}.{1}'.format(location.get('siteNumber', '').rstrip(), re.sub(DATE_TRANSFORM_REGEX, '', location.get('updated', '')))
-
+    return 'mlr.{0}.{1}.{2}'.format(location.get('agencyCode', '').strip(), location.get('siteNumber', '').rstrip(), re.sub(DATE_TRANSFORM_REGEX, '', location.get('updated', '')))
 
 def write_transaction(fd, location, transaction_type=''):
     '''
