@@ -28,7 +28,7 @@ JWT_ROLE_CLAIM = get_roles
 AUTH_CERT_PATH = os.getenv('oauth_server_cert_path', True)
 
 # Set the allowed_roles
-AUTHORIZED_ROLES = [role.strip() for role in os.getenv('authorized_roles', 'ROLE_mlr_allowed').split(',')]
+AUTHORIZED_ROLES = [role.strip() for role in os.getenv('authorized_roles', '').split(',')]
 
 # Configure exception JSON to not always output with a `message` field. Global exception handling is done via a custom handler in services.py.
 ERROR_INCLUDE_MESSAGE=False
