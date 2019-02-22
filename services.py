@@ -129,7 +129,7 @@ def _process_post(location, transaction_type=''):
             upload_to_s3(output_fd, destination_key, s3_bucket, aws_region, endpoint)
         except (OSError, ValueError, ParamValidationError) as err:
             application.logger.error("An error occurred while attempting to upload the file to S3: " + str(err))
-            return 'Unable to write the file', 500
+            return {'error_message':'Unable to write the file to S3.'}, 500
         else:
             return 'File written to s3://{0}/{1}'.format(s3_bucket, destination_key), 200
 
@@ -186,3 +186,8 @@ class Version(Resource):
                 "artifact": distribution.project_name
             }
         return resp
+
+@api.errorhandler
+def default_error_handler(error):
+    '''Default error handler'''
+    return {'error_message': str(error)}, getattr(error, 'code', 500)
