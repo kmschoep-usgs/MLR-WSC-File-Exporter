@@ -31,7 +31,7 @@ requirements = read_requirements('requirements.txt')
 
 setup(name='usgs_wma_mlr_wsc_file_exporter',
       version='0.10.0dev',
-      description='MLR Ddot Ingester Microservice',
+      description='MLR WSC File Exporter Microservice',
       author='Mary Bucknell, Andrew Yan, Dave Steinich, Zack Moore, Kathy Schoephoester',
       author_email='mlr-devs@usgs.gov',
       include_package_data=False,

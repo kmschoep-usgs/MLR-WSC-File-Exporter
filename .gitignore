@@ -110,3 +110,11 @@ ENV/
 # crt file for docker
 root.crt
 /.project
+
+# certificates
+**/*.jks
+**/*.p12
+**/*.crt
+**/*.csr
+**/*.chain
+**/*.key

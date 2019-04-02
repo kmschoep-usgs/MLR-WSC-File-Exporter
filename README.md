@@ -38,7 +38,7 @@ To run the application locally execute the following:
 % env/bin/python app.py
 ```
 
-The swagger documentation can then be accessed at http://127.0.0.1:5000/api
+The swagger documentation can then be accessed at http://127.0.0.1:5000/api (when running locally using the above command).
 
 The 
 Default configuration variables can be overridden be creating a .env file. For instance, to turn debug on you will want 
@@ -65,3 +65,14 @@ See http://flask-jwt-simple.readthedocs.io/en/latest/options.html for the other 
 Since this service requires authentication, you will also need to set AUTHORIZED_ROLES in your .env file to whatever you use to
 generate the token.
 
+## Running with Docker 
+This application can also be run locally using the docker container built during the build process, though this does not allow the application to be run in debug mode. The included `docker-compose` file has 2 profiles to choose from when running the application locally:
+
+1. mlr-wsc-file-exporter: This is the default profile which runs the application as it would be in our cloud environment. This is not recommended for local development as it makes configuring connections to other services running locally on your machine more difficult.
+2. mlr-wsc-file-exporter-local-dev: This is the profile which runs the application as it would be in the mlr-local-dev project, and is configured to make it easy to replace the mlr-wsc-file-exporter instance in the local-dev project with this instance. It is run the same as the `mlr-wsc-file-exporter` profile, except it uses the docker host network driver.
+
+Before any of these options are able to be run you must also generate certificates for this application to serve using the `create_certificates` script in the `docker/certificates` directory. Additionally, this service must be able to connect to a running instance of Water Auth when starting, and it is recommended that you use the Water Auth instance from the `mlr-local-dev` project to accomplish this. In order for this application to communicate with any downstream services that it must call, including Water Auth, you must also place the certificates that are being served by those services into the `docker/certificates/import_certs` directory to be imported into the Python CA Certificates of the running container.
+
+To build and run the application after completing the above steps you can run: `docker-compose up --build {profile}`, replacing `{profile}` with one of the options listed above.
+
+The swagger documentation can then be accessed at http://127.0.0.1:6024/api

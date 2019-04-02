@@ -1,0 +1,26 @@
+---
+  version: '3.7'
+      
+  services:
+    mlr-wsc-file-exporter:
+      build: .
+      image: mlr-wsc-file-exporter
+      ports:
+        - "6024:6024"
+      volumes: 
+        - ./docker/certificates/import_certs:/home/python/certificates:ro
+      env_file:
+        - ./docker/config.env
+        - ./docker/secrets.env
+    
+    mlr-wsc-file-exporter-local-dev:
+      build: .
+      image: mlr-wsc-file-exporter
+      network_mode: "host"
+      ports:
+        - "6024:6024"
+      volumes: 
+        - ./docker/certificates/import_certs:/home/python/certificates:ro
+      env_file:
+        - ./docker/config.env
+        - ./docker/secrets.env
