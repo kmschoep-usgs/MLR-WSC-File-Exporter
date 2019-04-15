@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html). (Patch version X.Y.0 is implied if not specified.)
 
 ## [Unreleased]
+
+## [0.10.0] - 2019-04-12 - End of Pilot
 ### Added
 - Docker configuration
 
@@ -65,7 +67,8 @@ CVE https://nvd.nist.gov/vuln/detail/CVE-2018-10903
 - POST endpoint /file_export/update which creates an update transaction file for the location in the payload.
 - Swagger docs endpoint /api
 
-[Unreleased]: https://github.com/USGS-CIDA/MLR-WSC-File-Exporter/compare/MLR-WSC-File-Exporter-0.9.0...master
+[Unreleased]: https://github.com/USGS-CIDA/MLR-WSC-File-Exporter/compare/MLR-WSC-File-Exporter-0.10.0...master
+[0.10.0]: https://github.com/USGS-CIDA/MLR-WSC-File-Exporter/compare/MLR-WSC-File-Exporter-0.9.0...MLR-WSC-File-Exporter-0.10.0
 [0.9.0]: https://github.com/USGS-CIDA/MLR-WSC-File-Exporter/compare/MLR-WSC-File-Exporter-0.8.0...MLR-WSC-File-Exporter-0.9.0
 [0.8.0]: https://github.com/USGS-CIDA/MLR-WSC-File-Exporter/compare/MLR-WSC-File-Exporter-0.7.0...MLR-WSC-File-Exporter-0.8.0
 [0.7.0]: https://github.com/USGS-CIDA/MLR-WSC-File-Exporter/compare/MLR-WSC-File-Exporter-0.6.0...MLR-WSC-File-Exporter-0.7.0
