@@ -2,10 +2,20 @@
 [![Build Status](https://travis-ci.org/USGS-CIDA/MLR-WSC-File-Exporter.svg?branch=master)](https://travis-ci.org/USGS-CIDA/MLR-WSC-File-Exporter)
 [![Coverage Status](https://coveralls.io/repos/github/USGS-CIDA/MLR-WSC-File-Exporter/badge.svg?branch=master)](https://coveralls.io/github/USGS-CIDA/MLR-WSC-File-Exporter?branch=master)
 
-Provides services which take an MLR Legacy location and write a MLR Legacy transaction file to a directory. The
-directory can be specified with the environment variable, EXPORT_DIRECTORY, or by providing a alternative configuration file
-in .env. If neither are provided, the file will be written to the project's home directory.
+## Service Description
+This service is part of the MLR microservices and is responsible for generating single-location transaction files and uploading those files into a specified S3 bucket to be processed by the MLR Legacy System side of the application and applied to the Legacy Host databases. More information about the whole MLR export process and why we generate and send files to legacy hosts (as well as how the process works after the file is uplaoded to S3) can be found in the MLR project documentation. This service represents the end of the scope of the Cloud-based MLR microservices, and what happens to these files after they're uploaded to S3 is completely out of the control of the MLR services (and fully in the control of the MLR Legacy System).
 
+This service creates a single transaction file for each transaction processed in a DDot file (meaning each location added or updated). That means that this service is called multiple times for a single DDot file: once for each transaction within the uploaded DDot file. The transaction file format was decided upon jointly between the MLR Services team and the MLR Legacy System team and is documented in the MLR project documentation.
+
+This service expects a JSON document containing the _FULL_ set of data for a single location to be sent to it in the request. We expect the _FULL_ set of data for a location to be sent rather than just the fields that were changed or updated because of the way that the MLR Legacy System was implemented and to simplify the export process overall. This requirement allows us to use the same export method for sending changes to the Legacy Hosts _and_ for sending a specific location from MLR to all of the Legacy Hosts that may not have already had that site locally in their system.
+
+Transaction files are named in a special format that allows the MLR Legacy System to properly order and process the files and apply the changes to the correct corresponding locations in the Host databases. This format is: `mlr.[agency code].[site number].[updated date/time]`. The transformation from the location JSON received from the MLR Legacy CRU service and the transaction file format includes mapping the location fields names from the names used in MLR to the corresponding column names used in the legacy Host databases. This field-to-column mapping is stored in the `export_utils.py` file. After the field names are properly transformed they are printed out to the export file using the proper formatting.
+
+Once the transaction file has been constructed this service then uses the Python AWS Boto client to upload the file into an S3 bucket configured by the application configuration file (or corresponding system environment variables). The relevant configuration properties can be viewed in the `config.py` file.
+
+Specific details about the API methods of this service, including the request and response formats, can be seen in the service Swagger API documentation.
+
+## Building and Running
 This project has been built and tested with python 3.6.x. To build the project locally you will need
 python 3 and virtualenv installed.
 ```bash
