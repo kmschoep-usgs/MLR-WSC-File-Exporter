@@ -34,7 +34,7 @@ ENV authorized_roles=test_default
 ENV S3_BUCKET=default-location
 ENV AWS_REGION=default-region
 ENV TIERNAME=development
-ENV artifact_id=usgs_wma_mlr_wsc_file_exporter
+ENV artifact_id=usgs-wma-mlr-wsc-file-exporter
 
 COPY --chown=1000:1000 --from=build /build/dist/*.whl .
 
