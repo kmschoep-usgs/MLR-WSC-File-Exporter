@@ -10,8 +10,14 @@ S3_ENDPOINT_URL = os.getenv('S3_ENDPOINT_URL', None)
 
 # The following six variables configure authentication
 
+# If using a JWK Set, set the environment variable AUTH_JWKS_URL to the url where it can be retrieved
+AUTH_JWKS_URL = os.getenv('oauth_server_jwks_url')
+
 # If using a public key, set the environment variable AUTH_TOKEN_KEY_URL to the url where it can be retrieved
 AUTH_TOKEN_KEY_URL = os.getenv('oauth_server_token_key_url')
+
+# Set the path to the certificate for AUTH_JWKS_URL/AUTH_TOKEN_KEY_URL. If set to False then, SSL verification will not occur.
+AUTH_CERT_PATH = os.getenv('oauth_server_cert_path', True)
 
 # If using the above, use the AUTH_TOKEN_KEY_ALGORITHM to set the algorithm. By default it will be RS256
 JWT_ALGORITHM = os.getenv('jwt_algorithm', 'HS256')
@@ -23,9 +29,6 @@ JWT_DECODE_AUDIENCE = os.getenv('jwt_decode_audience')
 def get_roles(dict):
     return dict.get('authorities')
 JWT_ROLE_CLAIM = get_roles
-
-# Set the path
-AUTH_CERT_PATH = os.getenv('oauth_server_cert_path', True)
 
 # Set the allowed_roles
 AUTHORIZED_ROLES = [role.strip() for role in os.getenv('authorized_roles', '').split(',')]
