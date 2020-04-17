@@ -28,7 +28,7 @@ LABEL maintainer="gs-w_eto_eb_federal_employees@usgs.gov"
 
 ENV listening_port=6024
 ENV protocol=https
-ENV oauth_server_token_key_url=https://example.gov/oauth/token_key
+ENV oauth_server_jwks_url=https://test.gov/oauth/jwks.json
 ENV authorized_roles=test_default
 ENV S3_BUCKET=default-location
 ENV AWS_REGION=default-region
