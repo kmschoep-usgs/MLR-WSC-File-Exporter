@@ -92,16 +92,30 @@ location_model = api.model('LocationModel', {
     "wellDepth": fields.String()
 })
 
+location_change_model = api.model('LocationChangeModel', {
+    "agencyCode": fields.String(),
+    "siteNumber": fields.String(),
+    "newAgencyCode": fields.String(),
+    "newSiteNumber": fields.String(),
+    "requesterName": fields.String(),
+    "updated": fields.String(),
+    "reasonText": fields.String()
+})
+
 expected_keys = set(iter(location_model.keys()))
 
+expected_change_keys = set(iter(location_change_model.keys()))
 
-def _missing_keys(json_data):
+def _missing_keys(json_data, transaction_type):
     """
     :param dict json_data:
     :return: list of strings - missing keys
     """
     request_keys = set(iter(json_data.keys()))
-    return expected_keys.difference(request_keys)
+    if transaction_type == "Change": 
+        return expected_change_keys.difference(request_keys)
+    else:
+        return expected_keys.difference(request_keys)
 
 
 def _process_post(location, transaction_type=''):
@@ -110,7 +124,7 @@ def _process_post(location, transaction_type=''):
     :param str transaction_type: Will be assigned to the 'trans_type' field in the exported file
     :return: tuple (response_data, response_status)
     """
-    missing_keys = _missing_keys(location)
+    missing_keys = _missing_keys(location, transaction_type)
     if missing_keys:
         return {
            'error_message': 'Missing keys: {0}'.format(', '.join(missing_keys))
@@ -161,12 +175,23 @@ class UpdateFileExporter(Resource):
     def post(self):
         return _process_post(request.get_json(), transaction_type='Update')
 
+@api.route('/file_export/change')
+class ChangeFileExporter(Resource):
+
+    @api.response(200, "Successfully wrote transaction file")
+    @api.response(400, "Bad request")
+    @api.response(401, 'Not authorized')
+    @api.response(500, "Unable to write the file")
+    @api.doc(security='apikey')
+    @api.expect(location_change_model)
+    @jwt_role_required(application.config['AUTHORIZED_ROLES'])
+    def post(self):
+        return _process_post(request.get_json(), transaction_type='Change')
 
 version_model = api.model('VersionModel', {
     'version': fields.String,
     'artifact': fields.String
 })
-
 
 @api.route('/version')
 class Version(Resource):

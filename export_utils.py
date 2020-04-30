@@ -62,7 +62,11 @@ KEY_TO_COLUMN_MAPPING = {
     "created": "site_cr",
     "updatedBy": "site_mn",
     "updated": "site_md",
-    "minorCivilDivisionCode": "mcd_cd"
+    "minorCivilDivisionCode": "mcd_cd",
+    "newAgencyCode": "new_agency_cd",
+    "newSiteNumber": "new_site_no",
+    "requesterName": "requester_nm",
+    "reasonText": "reason_tx"
 }
 
 DATE_TRANSFORM_REGEX = re.compile('[^\d]')
