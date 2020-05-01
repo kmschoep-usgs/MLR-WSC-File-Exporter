@@ -37,7 +37,7 @@ class TestWriteTransaction(TestCase):
 
     def setUp(self):
         self.fd = BytesIO()
-        # Using an ordered dictionary to guarentee iteration order
+        # Using an ordered dictionary to guarantee iteration order
         self.location = OrderedDict({
             'id' : 1234,
             'agencyCode' : 'USGS ',
@@ -174,6 +174,43 @@ class TestWriteTransaction(TestCase):
         write_transaction(self.fd, self.location, transaction_type= 'Update')
         self.assertEqual(self.fd.getvalue(), 'trans_type=Update\n{0}'.format(self.expected_response).encode())
 
+class TestWriteChangeTransaction(TestCase):
+
+    def setUp(self):
+        self.fd = BytesIO()
+        # Using an ordered dictionary to guarantee iteration order
+        self.location_change = OrderedDict({
+            "agencyCode" : "USGS",
+            "siteNumber": "123456789012345",
+            "newAgencyCode" : "BLAH",
+            "newSiteNumber": "999999999",
+            "updated": "2017-12-14 12:02:44",
+            "requesterName": "tester",
+            "reasonText": "test primary key change"
+        })
+
+        self.expected_response = (
+        "agency_cd=USGS\n"
+        "site_no=123456789012345\n"
+        "new_agency_cd=BLAH\n"
+        "new_site_no=999999999\n"
+        "site_md=20171214120244\n"
+        "requester_nm=tester\n"
+        "reason_tx=test primary key change\n"
+        "DONE"
+        )
+
+    def tearDown(self):
+        self.fd.close()
+
+    def test_empty_dict(self):
+        write_transaction(self.fd, {}, transaction_type='Change')
+        self.assertEqual(self.fd.getvalue(), 'trans_type=Change\nDONE'.encode())
+
+    def test_normal_location(self):
+        self.maxDiff = None
+        write_transaction(self.fd, self.location_change, transaction_type= 'Change')
+        self.assertEqual(self.fd.getvalue(), 'trans_type=Change\n{0}'.format(self.expected_response).encode())
 
 class TestUploadToS3(TestCase):
 
