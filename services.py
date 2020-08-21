@@ -1,4 +1,5 @@
 from io import BytesIO
+from datetime import datetime
 import pkg_resources
 import logging
 
@@ -129,7 +130,8 @@ def _process_post(location, expected_model, transaction_type=''):
         }, 400
 
     else:
-        file_name = transaction_file_name(location)
+        current_timestamp = datetime.now(tz=None).strftime("%Y-%m-%d %H:%M:%S")
+        file_name = transaction_file_name(location, current_timestamp)
         output_fd = BytesIO()
         s3_bucket = application.config['S3_BUCKET']
         aws_region = application.config['AWS_REGION']

@@ -75,13 +75,13 @@ def _value_str(value):
     return '' if value is None else str(value)
 
 
-def transaction_file_name(location):
+def transaction_file_name(location, current_timestamp):
     '''
 
     :param dict location:
     :return: str
     '''
-    return 'mlr.{0}.{1}.{2}'.format(location.get('agencyCode', '').strip(), location.get('siteNumber', '').rstrip(), re.sub(DATE_TRANSFORM_REGEX, '', location.get('updated', '')))
+    return 'mlr.{0}.{1}.{2}'.format(location.get('agencyCode', '').strip(), location.get('siteNumber', '').rstrip(), re.sub(DATE_TRANSFORM_REGEX, '', current_timestamp))
 
 def write_transaction(fd, location, transaction_type=''):
     '''
